@@ -1,5 +1,7 @@
 # Port Variable Rate Lending
 
+Forked from [Solana Token Lending](https://github.com/solana-labs/solana-program-library/)
+
 ## Bug Bounty
 
 ![Logo black@4x (1)](https://user-images.githubusercontent.com/9982417/149652968-819cbc9e-06b7-41fe-b0d3-aa016843b570.png)
