@@ -1,0 +1,15 @@
+anchor_version = "0.19.0"
+
+[workspace]
+members = [
+    "token-lending/program",
+    "staking/program",
+]
+
+[provider]
+cluster = "mainnet"
+wallet = "~/.config/solana/id.json"
+
+[programs.mainnet]
+port_finance_variable_rate_lending = "Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR"
+port_finance_staking = "stkarvwmSzv2BygN5e2LeTwimTczLWHCKPKGC2zVLiq"

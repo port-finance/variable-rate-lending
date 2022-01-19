@@ -1,0 +1,10 @@
+[workspace]
+members = [
+  "token-lending/program",
+  "token-lending/cli",
+  "staking/program",
+  "staking/cli"
+]
+
+[profile.dev]
+split-debuginfo = "unpacked"
