@@ -39,12 +39,9 @@ $ cargo test-bpf  # <-- runs BPF program tests
 
 
 ### Verify Build
-Dump on-chain file to a local file
 ```
-solana program dump <program-id> <file-name>
+anchor verify Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR
 ```
-Compare the on-chain file with a local build using `vbindiff`
-
 
 
 
