@@ -40,7 +40,8 @@ $ cargo test-bpf  # <-- runs BPF program tests
 
 ### Verify Build
 ```
-anchor verify Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR
+anchor verify -p port_finance_variable_rate_lending Port7uDYB3wk6GJAw4KT1WpTeMtSu9bTcChBHkX2LfR
+anchor verify -p port_finance_staking stkarvwmSzv2BygN5e2LeTwimTczLWHCKPKGC2zVLiq
 ```
 
 
