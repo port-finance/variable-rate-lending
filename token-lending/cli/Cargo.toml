@@ -1,0 +1,24 @@
+[package]
+authors = ["Port Finance Maintainers <maintainers@solana.foundation>"]
+description = "Port Finance Lending CLI"
+edition = "2018"
+homepage = ""
+license = "Apache-2.0"
+name = "port-lending-cli"
+repository = "https://github.com/port-finance"
+version = "0.1.0"
+
+[dependencies]
+clap = "2.33.3"
+solana-clap-utils = "1.8.1"
+solana-cli-config = "1.8.1"
+solana-client = "1.8.1"
+solana-logger = "1.8.1"
+solana-sdk = "1.8.1"
+solana-program = "1.8.1"
+port-finance-variable-rate-lending = { path = "../program", features = ["no-entrypoint"] }
+spl-token = { version = "3.1.0", features = ["no-entrypoint"] }
+
+[[bin]]
+name = "port-lending-cli"
+path = "src/main.rs"
