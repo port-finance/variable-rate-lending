@@ -32,7 +32,7 @@ async fn test_success() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(38_000);
+    test.set_bpf_compute_max_units(88_000);
 
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 10 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
     const SOL_RESERVE_COLLATERAL_LAMPORTS: u64 = 2 * SOL_DEPOSIT_AMOUNT_LAMPORTS;
@@ -134,7 +134,7 @@ async fn test_deposit_and_collateral_success() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(48_000);
+    test.set_bpf_compute_max_units(88_000);
 
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 10 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
     const SOL_RESERVE_COLLATERAL_LAMPORTS: u64 = 2 * SOL_DEPOSIT_AMOUNT_LAMPORTS;
@@ -275,7 +275,7 @@ async fn test_deposit_and_collateral_success_with_liquidity_reward() {
         processor!(port_finance_staking::processor::process_instruction),
     );
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(60_000);
+    test.set_bpf_compute_max_units(80_000);
 
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 10 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
     const SOL_RESERVE_COLLATERAL_LAMPORTS: u64 = 2 * SOL_DEPOSIT_AMOUNT_LAMPORTS;
@@ -530,7 +530,7 @@ async fn test_deposit_and_collateral_success_with_liquidity_reward_fail() {
         processor!(process_instruction),
     );
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(60_000);
+    test.set_bpf_compute_max_units(80_000);
     test.prefer_bpf(false);
     test.add_program(
         "port_finance_staking",
