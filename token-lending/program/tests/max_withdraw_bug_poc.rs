@@ -130,26 +130,9 @@ async fn test_success() {
     let rent = banks_client.get_rent().await.unwrap();
 
     // this works by depositing SOL and USDC. borrowing USDC then withdrawing USDC
-    // at which time the supplys will still be > the borrows but the obligation will be
+    // at which time the supplys will still be greater than the borrows but the obligation will be
     // liquidatable and when you factor in the liquidation bonus we are able to withdraw
-    // all the supplys without repaying all the debt. This WILL work on mainnet because
-    // the SBR reserve has too high of a liquidation penalty compred to other assets
-
-    // the bug is in the max_withdraw_value function in obligation.rs
-    // it essentially takes the average LTV of an obligation and says how much you may
-    // withdraw based on that. But it should consider the LTV of the actual asset
-    // you are withdrawing. This error works because USDC LTV + SBR liq bonus > 100%
-
-    // I believe the fix is to do  something like this
-    // pub fn max_withdraw_value(&self, loan_to_value_ratio: Rate) -> Result<Decimal, ProgramError> {
-    //     if self.allowed_borrow_value <= self.borrowed_value {
-    //         return Ok(Decimal::zero());
-    //     }
-    //     self
-    //         .allowed_borrow_value
-    //         .try_sub(self.borrowed_value)?
-    //         .try_div(loan_to_value_ratio)
-    // }
+    // all the supplys without repaying all the debt.
 
     let mut transaction = Transaction::new_with_payer(
         &[
