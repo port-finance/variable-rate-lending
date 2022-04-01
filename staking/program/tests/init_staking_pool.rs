@@ -77,7 +77,7 @@ async fn test_success() {
 async fn test_success_with_dual_reward() {
     let mut test = staking_test!();
 
-    test.set_bpf_compute_max_units(38200);
+    test.set_bpf_compute_max_units(82200);
 
     let supply_accounts_owner = Keypair::new();
     let (mut banks_client, payer, _recent_blockhash) = test.start().await;

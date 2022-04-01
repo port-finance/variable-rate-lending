@@ -205,7 +205,7 @@ async fn withdraw_no_authority() {
 #[tokio::test]
 async fn withdraw_more_than_balance() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(8200);
+    test.set_bpf_compute_max_units(20200);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
