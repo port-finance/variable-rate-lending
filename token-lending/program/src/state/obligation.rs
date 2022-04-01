@@ -96,12 +96,14 @@ impl Obligation {
         withdraw_collateral_ltv: Rate,
     ) -> Result<Decimal, ProgramError> {
         if self.allowed_borrow_value <= self.borrowed_value {
-            Ok(Decimal::zero())
-        } else {
-            self.allowed_borrow_value
-                .try_sub(self.borrowed_value)?
-                .try_div(withdraw_collateral_ltv)
+            return Ok(Decimal::zero());
         }
+        if withdraw_collateral_ltv == Rate::zero() {
+            return Ok(self.deposited_value);
+        }
+        self.allowed_borrow_value
+            .try_sub(self.borrowed_value)?
+            .try_div(withdraw_collateral_ltv)
     }
 
     /// Calculate the maximum liquidity value that can be borrowed
