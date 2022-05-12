@@ -2354,7 +2354,7 @@ fn get_switchboard_price(
     switchboard_feed_account: &AccountInfo,
     clock: &Clock,
 ) -> Result<Decimal, ProgramError> {
-    const STALE_AFTER_SLOTS_ELAPSED: u64 = 50;
+    const STALE_AFTER_SLOTS_ELAPSED: u64 = 240;
     let account_buf = switchboard_feed_account.try_borrow_data()?;
     if account_buf.len() == 0 {
         msg!("The provided account is empty.");
@@ -2397,7 +2397,7 @@ fn get_switchboard_price(
     Ok(Decimal::from(price))
 }
 fn get_pyth_price(pyth_price_info: &AccountInfo, clock: &Clock) -> Result<Decimal, ProgramError> {
-    const STALE_AFTER_SLOTS_ELAPSED: u64 = 10;
+    const STALE_AFTER_SLOTS_ELAPSED: u64 = 240;
 
     let pyth_price_data = pyth_price_info.try_borrow_data()?;
     let pyth_price = pyth::load::<pyth::Price>(&pyth_price_data)
