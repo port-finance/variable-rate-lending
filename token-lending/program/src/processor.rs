@@ -37,6 +37,7 @@ use crate::{
         ReserveCollateral, ReserveConfig, ReserveLiquidity,
     },
 };
+use switchboard_v2::AggregatorAccountData;
 
 const PYTH: &str = "FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH";
 const PYTH_DEV: &str = "gSbePebfvPy7tRqimPoVecS2UsBvYv46ynrzWocc92s";
@@ -44,14 +45,20 @@ const PYTH_DEV: &str = "gSbePebfvPy7tRqimPoVecS2UsBvYv46ynrzWocc92s";
 const SWITCHBOARD: &str = "DtmE9D2CSB4L5D6A15mraeEjrGMm6auWVzgaD8hK2tZM";
 const SWITCHBOARD_DEV: &str = "7azgmy1pFXHikv36q1zZASvFq5vFa39TT9NweVugKKTU";
 
+const SWITCHBOARD_V2: &str = "SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f";
+const SWITCHBOARD_V2_DEV: &str = "2TfB33aLaneQb5TNVwyDz3jSZXS6jdW2ARw1Dgf84XCG";
+
+
 fn is_switchbaord_program(pubkey: &Pubkey) -> bool {
     let pubkey_str = pubkey.to_string();
-    pubkey_str == SWITCHBOARD || pubkey_str == SWITCHBOARD_DEV
+    pubkey_str == SWITCHBOARD || pubkey_str == SWITCHBOARD_DEV || pubkey_str == SWITCHBOARD_V2 || pubkey_str == SWITCHBOARD_V2_DEV
 }
+
 fn is_pyth_program(pubkey: &Pubkey) -> bool {
     let pubkey_str = pubkey.to_string();
     pubkey_str == PYTH || pubkey_str == PYTH_DEV
 }
+
 /// Processes an instruction
 pub fn process_instruction(
     program_id: &Pubkey,
@@ -2354,6 +2361,12 @@ fn get_switchboard_price(
     switchboard_feed_account: &AccountInfo,
     clock: &Clock,
 ) -> Result<Decimal, ProgramError> {
+    if switchboard_feed_info.owner == &switchboard_v2_mainnet::id()
+        || switchboard_feed_info.owner == &switchboard_v2_devnet::id()
+    {
+        return get_switchboard_price_v2(switchboard_feed_info, clock);
+    }
+
     const STALE_AFTER_SLOTS_ELAPSED: u64 = 240;
     let account_buf = switchboard_feed_account.try_borrow_data()?;
     if account_buf.len() == 0 {
@@ -2396,6 +2409,33 @@ fn get_switchboard_price(
 
     Ok(Decimal::from(price))
 }
+
+fn get_switchboard_price_v2(
+    switchboard_feed_info: &AccountInfo,
+    clock: &Clock,
+) -> Result<Decimal, ProgramError> {
+    const STALE_AFTER_SLOTS_ELAPSED: u64 = 240;
+
+    let feed = AggregatorAccountData::new(switchboard_feed_info)?;
+    let slots_elapsed = clock
+        .slot
+        .checked_sub(feed.latest_confirmed_round.round_open_slot)
+        .ok_or(LendingError::MathOverflow)?;
+    if slots_elapsed >= STALE_AFTER_SLOTS_ELAPSED {
+        msg!("Switchboard oracle price is stale");
+        return Err(LendingError::InvalidOracleConfig.into());
+    }
+
+    let price_switchboard_desc = feed.get_result()?;
+    if price_switchboard_desc.mantissa < 0 {
+        msg!("Switchboard oracle price is negative which is not allowed");
+        return Err(LendingError::InvalidOracleConfig.into());
+    }
+    let price = Decimal::from(price_switchboard_desc.mantissa as u128);
+    let exp = (10u64).checked_pow(price_switchboard_desc.scale).unwrap();
+    price.try_div(exp)
+}
+
 fn get_pyth_price(pyth_price_info: &AccountInfo, clock: &Clock) -> Result<Decimal, ProgramError> {
     const STALE_AFTER_SLOTS_ELAPSED: u64 = 240;
 
