@@ -49,14 +49,24 @@ const SWITCHBOARD_V2: &str = "SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f";
 const SWITCHBOARD_V2_DEV: &str = "2TfB33aLaneQb5TNVwyDz3jSZXS6jdW2ARw1Dgf84XCG";
 
 
-fn is_switchbaord_program(pubkey: &Pubkey) -> bool {
-    let pubkey_str = pubkey.to_string();
-    pubkey_str == SWITCHBOARD || pubkey_str == SWITCHBOARD_DEV || pubkey_str == SWITCHBOARD_V2 || pubkey_str == SWITCHBOARD_V2_DEV
-}
 
 fn is_pyth_program(pubkey: &Pubkey) -> bool {
     let pubkey_str = pubkey.to_string();
     pubkey_str == PYTH || pubkey_str == PYTH_DEV
+}
+
+fn is_switchbaord_program(pubkey: &Pubkey) -> bool {
+    is_switchbaord_program_v1(pubkey) || is_switchbaord_program_v2(pubkey)
+}
+
+fn is_switchbaord_program_v1(pubkey: &Pubkey) -> bool {
+    let pubkey_str = pubkey.to_string();
+    pubkey_str == SWITCHBOARD || pubkey_str == SWITCHBOARD_DEV
+}
+
+fn is_switchbaord_program_v2(pubkey: &Pubkey) -> bool {
+    let pubkey_str = pubkey.to_string();
+    pubkey_str == SWITCHBOARD_V2 || pubkey_str == SWITCHBOARD_V2_DEV
 }
 
 /// Processes an instruction
@@ -2357,14 +2367,14 @@ fn assert_uninitialized<T: Pack + IsInitialized>(
 fn unpack_mint(data: &[u8]) -> Result<Mint, LendingError> {
     Mint::unpack(data).map_err(|_| LendingError::InvalidTokenMint)
 }
+
 fn get_switchboard_price(
     switchboard_feed_account: &AccountInfo,
     clock: &Clock,
 ) -> Result<Decimal, ProgramError> {
-    if switchboard_feed_info.owner == &switchboard_v2_mainnet::id()
-        || switchboard_feed_info.owner == &switchboard_v2_devnet::id()
+    if is_switchbaord_program_v2(switchboard_feed_account.owner)
     {
-        return get_switchboard_price_v2(switchboard_feed_info, clock);
+        return get_switchboard_price_v2(switchboard_feed_account, clock);
     }
 
     const STALE_AFTER_SLOTS_ELAPSED: u64 = 240;

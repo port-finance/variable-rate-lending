@@ -22,6 +22,7 @@ thiserror = "1.0"
 uint = "0.8"
 port-finance-staking = { path = "../../staking/program", features = [ "no-entrypoint" ] }
 switchboard-program = "0.2.1"
+switchboard-v2 = "0.1.3"
 quick-protobuf = "*"
 
 [dev-dependencies]
