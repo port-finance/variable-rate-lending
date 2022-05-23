@@ -23,7 +23,7 @@ use {
         keypair::signer_from_path,
     },
     solana_client::rpc_client::RpcClient,
-    solana_program::{native_token::lamports_to_sol, program_pack::Pack, pubkey::Pubkey},
+    solana_program::{program_pack::Pack, pubkey::Pubkey},
     solana_sdk::{
         commitment_config::CommitmentConfig,
         signature::{Keypair, Signer},
@@ -691,7 +691,7 @@ fn command_change_staking_pool_admin(
     new_staking_pool_admin: Pubkey,
     staking_pool: Pubkey,
 ) -> CommandResult {
-    let (recent_blockhash, _fee_calculator) = config.rpc_client.get_recent_blockhash()?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
 
     let mut transaction = Transaction::new_with_payer(
         &[change_admin(
@@ -720,7 +720,7 @@ fn command_change_staking_pool_owner(
     new_staking_pool_owner: Pubkey,
     staking_pool: Pubkey,
 ) -> CommandResult {
-    let (recent_blockhash, _fee_calculator) = config.rpc_client.get_recent_blockhash()?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
 
     let mut transaction = Transaction::new_with_payer(
         &[change_owner(
@@ -749,7 +749,7 @@ fn command_change_duration(
     staking_pool: Pubkey,
     amount: i64,
 ) -> CommandResult {
-    let (recent_blockhash, _fee_calculator) = config.rpc_client.get_recent_blockhash()?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
 
     let mut transaction = Transaction::new_with_payer(
         &[change_duration(
@@ -787,7 +787,7 @@ fn command_change_reward_supply(
             staking_pool, reward_supply_amount, sub_reward_supply_amount
         );
     }
-    let (recent_blockhash, _fee_calculator) = config.rpc_client.get_recent_blockhash()?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     let reward_token_pool_pubkey =
         StakingPool::unpack(&config.rpc_client.get_account(&staking_pool).unwrap().data)
             .unwrap()
@@ -960,19 +960,7 @@ fn command_init_staking_pool(
     ]);
     let mut transaction =
         Transaction::new_with_payer(&instructions, Some(&config.fee_payer.pubkey()));
-    let reward_pool_balance = config
-        .rpc_client
-        .get_minimum_balance_for_rent_exemption(Token::LEN)?;
-    let staking_pool_balance = config
-        .rpc_client
-        .get_minimum_balance_for_rent_exemption(StakingPool::LEN)?;
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
-    check_fee_payer_balance(
-        config,
-        reward_pool_balance
-            + staking_pool_balance
-            + fee_calculator.calculate_fee(transaction.message()),
-    )?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
 
     let mut signers: Vec<&dyn Signer> = if sub_supply.is_some() {
         vec![&sub_reward_pool_keypair]
@@ -1044,11 +1032,7 @@ fn command_add_sub_reward(
         Some(&config.fee_payer.pubkey()),
     );
 
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
-    check_fee_payer_balance(
-        config,
-        reward_pool_balance + fee_calculator.calculate_fee(transaction.message()),
-    )?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     transaction.sign(
         &vec![
             config.fee_payer.as_ref(),
@@ -1060,23 +1044,6 @@ fn command_add_sub_reward(
     );
     send_transaction(config, transaction)?;
     Ok(())
-}
-
-// HELPERS
-
-fn check_fee_payer_balance(config: &Config, required_balance: u64) -> Result<(), Error> {
-    let balance = config.rpc_client.get_balance(&config.fee_payer.pubkey())?;
-    if balance < required_balance {
-        Err(format!(
-            "Fee payer, {}, has insufficient balance: {} required, {} available",
-            config.fee_payer.pubkey(),
-            lamports_to_sol(required_balance),
-            lamports_to_sol(balance)
-        )
-        .into())
-    } else {
-        Ok(())
-    }
 }
 
 fn send_transaction(
