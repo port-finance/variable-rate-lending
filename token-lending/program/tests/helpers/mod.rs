@@ -21,6 +21,7 @@ use switchboard_program::{
 };
 
 use port_finance_staking::state::staking_pool::RatePerSlot;
+use port_finance_variable_rate_lending::math::TryDiv;
 use port_finance_variable_rate_lending::{
     instruction::{
         borrow_obligation_liquidity, deposit_reserve_liquidity,
@@ -38,7 +39,6 @@ use port_finance_variable_rate_lending::{
 };
 use quick_protobuf::deserialize_from_slice;
 use switchboard_v2::AggregatorAccountData;
-use port_finance_variable_rate_lending::math::TryDiv;
 
 pub mod flash_loan_receiver;
 pub mod genesis;
@@ -1341,13 +1341,10 @@ pub fn add_sol_switchboard_oracle(
     )
 }
 
-pub fn add_gst_switchboard_oracle_v2(
-    test: &mut ProgramTest,
-) -> (Option<u64>, TestOracle) {
+pub fn add_gst_switchboard_oracle_v2(test: &mut ProgramTest) -> (Option<u64>, TestOracle) {
     let oracle_program_id =
         Pubkey::from_str("SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f").unwrap();
-    let price_pubkey = Pubkey::from_str("JA1GQW8ta1LjNn3h1vZmhL3fWEdZ6F9QfZHvPB4y7fLm")
-        .unwrap();
+    let price_pubkey = Pubkey::from_str("JA1GQW8ta1LjNn3h1vZmhL3fWEdZ6F9QfZHvPB4y7fLm").unwrap();
 
     test.add_account_with_file_data(
         price_pubkey,

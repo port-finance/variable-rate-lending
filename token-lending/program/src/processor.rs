@@ -48,8 +48,6 @@ const SWITCHBOARD_DEV: &str = "7azgmy1pFXHikv36q1zZASvFq5vFa39TT9NweVugKKTU";
 const SWITCHBOARD_V2: &str = "SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f";
 const SWITCHBOARD_V2_DEV: &str = "2TfB33aLaneQb5TNVwyDz3jSZXS6jdW2ARw1Dgf84XCG";
 
-
-
 fn is_pyth_program(pubkey: &Pubkey) -> bool {
     let pubkey_str = pubkey.to_string();
     pubkey_str == PYTH || pubkey_str == PYTH_DEV
@@ -2372,8 +2370,7 @@ fn get_switchboard_price(
     switchboard_feed_account: &AccountInfo,
     clock: &Clock,
 ) -> Result<Decimal, ProgramError> {
-    if is_switchbaord_program_v2(switchboard_feed_account.owner)
-    {
+    if is_switchbaord_program_v2(switchboard_feed_account.owner) {
         return get_switchboard_price_v2(switchboard_feed_account, clock);
     }
 
