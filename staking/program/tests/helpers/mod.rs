@@ -110,6 +110,7 @@ impl TestStakeAccount {
                 create_account(
                     &payer.pubkey(),
                     &stake_account_keypair.pubkey(),
+                    // Hack to make sure there is SOL to be rent exempt
                     rent.minimum_balance(StakeAccount::LEN) + 100,
                     StakeAccount::LEN as u64,
                     &port_finance_staking::id(),
@@ -318,6 +319,7 @@ impl TestStakingPool {
                 create_account(
                     &payer.pubkey(),
                     &staking_pool_keypair.pubkey(),
+                    // Hack to make sure there is SOL to be rent exempt
                     rent.minimum_balance(StakingPool::LEN) + 100,
                     StakingPool::LEN as u64,
                     &port_finance_staking::id(),
