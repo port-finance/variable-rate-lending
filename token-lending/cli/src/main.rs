@@ -27,9 +27,7 @@ use {
         keypair::signer_from_path,
     },
     solana_client::rpc_client::RpcClient,
-    solana_program::{
-        native_token::lamports_to_sol, program_option::COption, program_pack::Pack, pubkey::Pubkey,
-    },
+    solana_program::{program_option::COption, program_pack::Pack, pubkey::Pubkey},
     solana_sdk::{
         commitment_config::CommitmentConfig,
         signature::{Keypair, Signer},
@@ -751,8 +749,7 @@ fn command_update_reserve(
         )],
         Some(&config.fee_payer.pubkey()),
     );
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
-    check_fee_payer_balance(config, fee_calculator.calculate_fee(transaction.message()))?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     transaction.sign(
         &vec![config.fee_payer.as_ref(), lending_market_owner.as_ref()],
         recent_blockhash,
@@ -797,11 +794,7 @@ fn command_create_lending_market(
         Some(&config.fee_payer.pubkey()),
     );
 
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
-    check_fee_payer_balance(
-        config,
-        lending_market_balance + fee_calculator.calculate_fee(transaction.message()),
-    )?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     transaction.sign(
         &vec![config.fee_payer.as_ref(), &lending_market_keypair],
         recent_blockhash,
@@ -891,13 +884,6 @@ fn command_add_reserve(
     let liquidity_supply_balance = token_account_balance;
     let liquidity_fee_receiver_balance = token_account_balance;
 
-    let total_balance = reserve_balance
-        + collateral_mint_balance
-        + collateral_supply_balance
-        + user_collateral_balance
-        + liquidity_supply_balance
-        + liquidity_fee_receiver_balance;
-
     let mut transaction_1 = Transaction::new_with_payer(
         &[
             create_account(
@@ -986,13 +972,7 @@ fn command_add_reserve(
         Some(&config.fee_payer.pubkey()),
     );
 
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
-    check_fee_payer_balance(
-        config,
-        total_balance
-            + fee_calculator.calculate_fee(transaction_1.message())
-            + fee_calculator.calculate_fee(transaction_2.message()),
-    )?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     transaction_1.sign(
         &vec![
             config.fee_payer.as_ref(),
@@ -1081,31 +1061,13 @@ fn command_repay_loan(
     ));
     let mut transaction =
         Transaction::new_with_payer(&instructions, Some(&config.fee_payer.pubkey()));
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
-    check_fee_payer_balance(config, fee_calculator.calculate_fee(transaction.message()))?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     transaction.sign(
         &vec![config.fee_payer.as_ref(), &source_wallet],
         recent_blockhash,
     );
     send_transaction(config, transaction)?;
     Ok(())
-}
-
-// HELPERS
-
-fn check_fee_payer_balance(config: &Config, required_balance: u64) -> Result<(), Error> {
-    let balance = config.rpc_client.get_balance(&config.fee_payer.pubkey())?;
-    if balance < required_balance {
-        Err(format!(
-            "Fee payer, {}, has insufficient balance: {} required, {} available",
-            config.fee_payer.pubkey(),
-            lamports_to_sol(required_balance),
-            lamports_to_sol(balance)
-        )
-        .into())
-    } else {
-        Ok(())
-    }
 }
 
 fn send_transaction(
