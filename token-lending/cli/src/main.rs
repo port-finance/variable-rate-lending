@@ -835,7 +835,7 @@ fn command_update_oracle(
         )],
         Some(&config.fee_payer.pubkey()),
     );
-    let (recent_blockhash, fee_calculator) = config.rpc_client.get_recent_blockhash()?;
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
     transaction.sign(
         &vec![config.fee_payer.as_ref(), lending_market_owner.as_ref()],
         recent_blockhash,
