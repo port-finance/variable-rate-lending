@@ -5,7 +5,9 @@ use solana_client::rpc_config::RpcSendTransactionConfig;
 use solana_sdk::commitment_config::CommitmentLevel::Finalized;
 use solana_sdk::signature::read_keypair_file;
 
-use port_finance_variable_rate_lending::instruction::{refresh_obligation, update_reserve};
+use port_finance_variable_rate_lending::instruction::{
+    refresh_obligation, update_oracle, update_reserve,
+};
 use port_finance_variable_rate_lending::instruction::{
     refresh_reserve, repay_obligation_liquidity,
 };
@@ -238,6 +240,43 @@ fn main() {
                         .help("deposit staking pool")
                 )
                 .args(&update_reserve_args)
+        )
+        .subcommand(
+            SubCommand::with_name("update-oracle")
+                .about("Update the oracle of the reserve")
+                .arg(
+                    Arg::with_name("reserve")
+                        .long("reserve")
+                        .validator(is_pubkey)
+                        .value_name("PUBKEY")
+                        .takes_value(true)
+                        .required(true)
+                        .help("Reserve to update")
+                )
+                .arg(
+                    Arg::with_name("lending_market")
+                        .long("market")
+                        .validator(is_pubkey)
+                        .value_name("PUBKEY")
+                        .takes_value(true)
+                        .required(true)
+                        .help("lending market")
+                )
+                .arg(
+                    Arg::with_name("lending_market_owner")
+                        .long("market-owner")
+                        .value_name("KEYPAIR")
+                        .takes_value(true)
+                        .required(true)
+                        .help("Owner of the lending market"),
+                )
+                .arg(
+                    Arg::with_name("oracle")
+                        .long("oracle")
+                        .value_name("PUBKEY")
+                        .takes_value(true)
+                        .help("price oracle")
+                )
         )
         .subcommand(
             SubCommand::with_name("repay-loan")
@@ -614,6 +653,26 @@ fn main() {
                 old_config,
             )
         }
+        ("update-oracle", Some(arg_matches)) => {
+            let reserve = pubkey_of(arg_matches, "reserve").unwrap();
+            let lending_market = pubkey_of(arg_matches, "lending_market").unwrap();
+            let mut wallet_manager = None;
+            let lending_market_owner = signer_from_path(
+                arg_matches,
+                arg_matches.value_of("lending_market_owner").unwrap(),
+                "lending_market_owner",
+                &mut wallet_manager,
+            )
+            .unwrap();
+            let oracle = pubkey_of(arg_matches, "oracle");
+            command_update_oracle(
+                &config,
+                reserve,
+                lending_market,
+                lending_market_owner,
+                oracle,
+            )
+        }
         ("add-reserve", Some(arg_matches)) => {
             let mut wallet_manager = None;
             let lending_market_owner = signer_from_path(
@@ -743,6 +802,33 @@ fn command_update_reserve(
         &[update_reserve(
             config.lending_program_id,
             reserve_config,
+            reserve,
+            lending_market,
+            lending_market_owner.pubkey(),
+        )],
+        Some(&config.fee_payer.pubkey()),
+    );
+    let recent_blockhash = config.rpc_client.get_latest_blockhash()?;
+    transaction.sign(
+        &vec![config.fee_payer.as_ref(), lending_market_owner.as_ref()],
+        recent_blockhash,
+    );
+    send_transaction(config, transaction)?;
+    Ok(())
+}
+
+fn command_update_oracle(
+    config: &Config,
+    reserve: Pubkey,
+    lending_market: Pubkey,
+    lending_market_owner: Box<dyn Signer>,
+    oracle: Option<Pubkey>,
+) -> CommandResult {
+    println!("update reserve {} with the oracle {:?}", reserve, oracle);
+    let mut transaction = Transaction::new_with_payer(
+        &[update_oracle(
+            config.lending_program_id,
+            oracle,
             reserve,
             lending_market,
             lending_market_owner.pubkey(),
