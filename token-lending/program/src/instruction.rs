@@ -379,6 +379,19 @@ pub enum LendingInstruction {
     ///   4. `[]` Rent sysvar.
     ///   5. `[]` Token program id.
     WithdrawFee,
+
+    // 18
+    /// Update oracle for an existing market reserve.
+    ///
+    /// Accounts expected by this instruction:
+    ///
+    ///   0. `[writable]` Reserve account
+    ///   1. `[]` Lending market account.
+    ///   2. `[signer]` Lending market owner.
+    UpdateOracle {
+        /// Oracle: either Pyth price pubkey or Switchboard price account
+        oracle: COption<Pubkey>,
+    },
 }
 
 impl LendingInstruction {
@@ -454,6 +467,10 @@ impl LendingInstruction {
                 Self::UpdateReserve { config }
             }
             17 => Self::WithdrawFee,
+            18 => {
+                let (oracle, _rest) = Self::unpack_coption_key_compact(rest)?;
+                Self::UpdateOracle { oracle }
+            }
             _ => {
                 msg!("Instruction cannot be unpacked");
                 return Err(LendingError::InstructionUnpackError.into());
@@ -655,6 +672,12 @@ impl LendingInstruction {
             }
             Self::WithdrawFee => {
                 buf.push(17);
+            }
+            Self::UpdateOracle { oracle } => {
+                buf.push(18);
+                let mut coption_key_buf = [0u8; 33];
+                pack_coption_key_compact(&oracle, &mut coption_key_buf);
+                buf.extend_from_slice(&coption_key_buf);
             }
         }
         buf
@@ -1302,5 +1325,33 @@ pub fn withdraw_fee(
         program_id,
         accounts,
         data: LendingInstruction::WithdrawFee.pack(),
+    }
+}
+
+/// Creates an `UpdateOracle` instruction.
+#[allow(clippy::too_many_arguments)]
+pub fn update_oracle(
+    program_id: Pubkey,
+    oracle: Option<Pubkey>,
+    reserve_pubkey: Pubkey,
+    lending_market_pubkey: Pubkey,
+    lending_market_owner_pubkey: Pubkey,
+) -> Instruction {
+    let mut accounts = vec![
+        AccountMeta::new(reserve_pubkey, false),
+        AccountMeta::new_readonly(lending_market_pubkey, false),
+        AccountMeta::new_readonly(lending_market_owner_pubkey, true),
+    ];
+
+    if let Some(oracle) = oracle {
+        accounts.push(AccountMeta::new_readonly(oracle, false));
+    };
+    Instruction {
+        program_id,
+        accounts,
+        data: LendingInstruction::UpdateOracle {
+            oracle: oracle.map_or(COption::None, COption::Some),
+        }
+        .pack(),
     }
 }
