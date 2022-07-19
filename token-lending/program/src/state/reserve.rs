@@ -256,7 +256,7 @@ impl Reserve {
                     repay_amount = max_amount.try_floor_u64()?;
                     withdraw_amount = Decimal::from(collateral.deposited_amount)
                         .try_mul(withdraw_pct)?
-                        .try_ceil_u64()?;
+                        .try_floor_u64()?;
                 }
             }
         } else {
@@ -288,7 +288,7 @@ impl Reserve {
                     repay_amount = settle_amount.try_floor_u64()?;
                     withdraw_amount = Decimal::from(collateral.deposited_amount)
                         .try_mul(withdraw_pct)?
-                        .try_ceil_u64()?;
+                        .try_floor_u64()?;
                 }
             }
         }
