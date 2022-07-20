@@ -236,7 +236,9 @@ impl Reserve {
         let withdraw_amount;
 
         // Close out obligations that are too small to liquidate normally
-        if liquidity.borrowed_amount_wads < LIQUIDATION_CLOSE_AMOUNT.into() {
+        if liquidity.borrowed_amount_wads < LIQUIDATION_CLOSE_AMOUNT.into()
+            || collateral.deposited_amount < LIQUIDATION_CLOSE_AMOUNT
+        {
             // settle_amount is fixed, calculate withdraw_amount and repay_amount
             settle_amount = liquidity.borrowed_amount_wads;
 
@@ -256,7 +258,7 @@ impl Reserve {
                     repay_amount = max_amount.try_ceil_u64()?;
                     withdraw_amount = Decimal::from(collateral.deposited_amount)
                         .try_mul(withdraw_pct)?
-                        .try_floor_u64()?;
+                        .try_ceil_u64()?;
                 }
             }
         } else {
