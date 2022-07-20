@@ -236,7 +236,9 @@ impl Reserve {
         let withdraw_amount;
 
         // Close out obligations that are too small to liquidate normally
-        if liquidity.borrowed_amount_wads < LIQUIDATION_CLOSE_AMOUNT.into() || collateral.deposited_amount < LIQUIDATION_CLOSE_AMOUNT {
+        if liquidity.borrowed_amount_wads < LIQUIDATION_CLOSE_AMOUNT.into()
+            || collateral.deposited_amount < LIQUIDATION_CLOSE_AMOUNT
+        {
             // settle_amount is fixed, calculate withdraw_amount and repay_amount
             settle_amount = liquidity.borrowed_amount_wads;
 

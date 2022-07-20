@@ -281,7 +281,7 @@ async fn test_success_one_lamport() {
         &mut banks_client,
         usdc_test_reserve.collateral_supply_pubkey,
     )
-        .await;
+    .await;
 
     let mut transaction = Transaction::new_with_payer(
         &[
@@ -293,7 +293,7 @@ async fn test_success_one_lamport() {
                 &[],
                 SOL_LIQUIDATION_AMOUNT_FRACTIONAL,
             )
-                .unwrap(),
+            .unwrap(),
             refresh_obligation(
                 port_finance_variable_rate_lending::id(),
                 test_obligation.pubkey,
@@ -349,7 +349,7 @@ async fn test_success_one_lamport() {
         &mut banks_client,
         usdc_test_reserve.collateral_supply_pubkey,
     )
-        .await;
+    .await;
     assert_eq!(
         collateral_supply_balance,
         initial_collateral_supply_balance - USDC_LIQUIDATION_AMOUNT_LAMPORTS
@@ -357,11 +357,8 @@ async fn test_success_one_lamport() {
 
     let obligation = test_obligation.get_state(&mut banks_client).await;
     assert_eq!(obligation.deposits.len(), 0);
-    assert_eq!(
-        obligation.deposits.len(), 0
-    )
+    assert_eq!(obligation.deposits.len(), 0)
 }
-
 
 #[tokio::test]
 async fn test_success_with_staking() {
