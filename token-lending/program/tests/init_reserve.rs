@@ -210,6 +210,74 @@ async fn test_success_switchboard_parsed() {
 }
 
 #[tokio::test]
+async fn test_success_switchboard_v2() {
+    let mut test = ProgramTest::new(
+        "port_finance_variable_rate_lending",
+        port_finance_variable_rate_lending::id(),
+        processor!(process_instruction),
+    );
+
+    // limit to track compute unit increase
+    test.set_bpf_compute_max_units(200_000);
+
+    let user_accounts_owner = Keypair::new();
+    let lending_market = add_lending_market(&mut test);
+    let (_, gst_oracle) = add_gst_switchboard_oracle_v2(&mut test);
+
+    let mut test_context = test.start_with_context().await;
+    test_context.warp_to_slot(134883675).unwrap(); // oracle open slot is at 134883674.
+
+    let ProgramTestContext {
+        mut banks_client,
+        payer,
+        ..
+    } = test_context;
+
+    const RESERVE_AMOUNT: u64 = 42;
+
+    let sol_user_liquidity_account = create_and_mint_to_token_account(
+        &mut banks_client,
+        spl_token::native_mint::id(),
+        None,
+        &payer,
+        user_accounts_owner.pubkey(),
+        RESERVE_AMOUNT,
+    )
+    .await;
+
+    let gst_reserve = TestReserve::init(
+        "gst".to_owned(),
+        &mut banks_client,
+        &lending_market,
+        &COption::Some(gst_oracle),
+        RESERVE_AMOUNT,
+        COption::None,
+        TEST_RESERVE_CONFIG,
+        spl_token::native_mint::id(),
+        sol_user_liquidity_account,
+        &payer,
+        &user_accounts_owner,
+    )
+    .await
+    .unwrap();
+
+    gst_reserve.validate_state(&mut banks_client).await;
+
+    let sol_liquidity_supply =
+        get_token_balance(&mut banks_client, gst_reserve.liquidity_supply_pubkey).await;
+    assert_eq!(sol_liquidity_supply, RESERVE_AMOUNT);
+    let user_sol_balance =
+        get_token_balance(&mut banks_client, gst_reserve.user_liquidity_pubkey).await;
+    assert_eq!(user_sol_balance, 0);
+    let user_sol_collateral_balance =
+        get_token_balance(&mut banks_client, gst_reserve.user_collateral_pubkey).await;
+    assert_eq!(
+        user_sol_collateral_balance,
+        RESERVE_AMOUNT * INITIAL_COLLATERAL_RATIO
+    );
+}
+
+#[tokio::test]
 async fn test_already_initialized() {
     let mut test = ProgramTest::new(
         "port_finance_variable_rate_lending",

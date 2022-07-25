@@ -21,6 +21,7 @@ use switchboard_program::{
 };
 
 use port_finance_staking::state::staking_pool::RatePerSlot;
+use port_finance_variable_rate_lending::math::TryDiv;
 use port_finance_variable_rate_lending::{
     instruction::{
         borrow_obligation_liquidity, deposit_reserve_liquidity,
@@ -37,6 +38,7 @@ use port_finance_variable_rate_lending::{
     },
 };
 use quick_protobuf::deserialize_from_slice;
+use switchboard_v2::AggregatorAccountData;
 
 pub mod flash_loan_receiver;
 pub mod genesis;
@@ -1335,6 +1337,38 @@ pub fn add_sol_switchboard_oracle(
         TestOracle {
             price_pubkey,
             price: Decimal::from_scaled_val(((out * (WAD as f64)) as u64).into()),
+        },
+    )
+}
+
+pub fn add_gst_switchboard_oracle_v2(test: &mut ProgramTest) -> (Option<u64>, TestOracle) {
+    let oracle_program_id =
+        Pubkey::from_str("SW1TCH7qEPTdLsDHRgPuMQjbQxKdH2aBStViMFnt64f").unwrap();
+    let price_pubkey = Pubkey::from_str("JA1GQW8ta1LjNn3h1vZmhL3fWEdZ6F9QfZHvPB4y7fLm").unwrap();
+
+    test.add_account_with_file_data(
+        price_pubkey,
+        u32::MAX as u64,
+        oracle_program_id,
+        &format!("{}", price_pubkey.to_string()),
+    );
+    let filename = &format!("{}", price_pubkey.to_string());
+    let mut data = read_file(find_file(filename).unwrap_or_else(|| {
+        panic!("Unable to locate {}", filename);
+    }));
+
+    if data.len() == 0 {
+        panic!("The provided account is empty.");
+    }
+    let agg_state = bytemuck::from_bytes_mut::<AggregatorAccountData>(&mut data[8..]);
+    let result = agg_state.get_result().unwrap();
+    let price = Decimal::from(result.mantissa as u128);
+    let exp = (10u64).checked_pow(result.scale).unwrap();
+    (
+        Some(agg_state.latest_confirmed_round.round_open_slot),
+        TestOracle {
+            price_pubkey,
+            price: price.try_div(exp).unwrap(),
         },
     )
 }
