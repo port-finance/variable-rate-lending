@@ -253,10 +253,10 @@ impl Reserve {
                 }
                 Ordering::Less => {
                     let withdraw_pct = liquidation_value.try_div(collateral.market_value)?;
-                    repay_amount = max_amount.try_floor_u64()?;
+                    repay_amount = max_amount.try_ceil_u64()?;
                     withdraw_amount = Decimal::from(collateral.deposited_amount)
                         .try_mul(withdraw_pct)?
-                        .try_ceil_u64()?;
+                        .try_floor_u64()?;
                 }
             }
         } else {
@@ -285,10 +285,10 @@ impl Reserve {
                 Ordering::Less => {
                     let withdraw_pct = liquidation_value.try_div(collateral.market_value)?;
                     settle_amount = liquidation_amount;
-                    repay_amount = settle_amount.try_floor_u64()?;
+                    repay_amount = settle_amount.try_ceil_u64()?;
                     withdraw_amount = Decimal::from(collateral.deposited_amount)
                         .try_mul(withdraw_pct)?
-                        .try_ceil_u64()?;
+                        .try_floor_u64()?;
                 }
             }
         }
