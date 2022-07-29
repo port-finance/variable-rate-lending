@@ -2392,7 +2392,7 @@ dependencies = [
  "num-traits",
  "proptest",
  "serde",
- "serde_yaml",
+ "serde_yaml 0.9.1",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -2416,7 +2416,7 @@ dependencies = [
  "proptest",
  "quick-protobuf",
  "serde",
- "serde_yaml",
+ "serde_yaml 0.9.1",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -3174,6 +3174,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_yaml"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71f1e71f8401ef389565b7d16731f3cd181cccd07e2e995f37beb1fd2304ffe1"
+dependencies = [
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
+ "unsafe-libyaml",
+]
+
+[[package]]
 name = "sha-1"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3444,7 +3457,7 @@ dependencies = [
  "lazy_static",
  "serde",
  "serde_derive",
- "serde_yaml",
+ "serde_yaml 0.8.26",
  "solana-clap-utils",
  "solana-sdk",
  "url",
@@ -4835,6 +4848,12 @@ checksum = "382810877fe448991dfc7f0dd6e3ae5d58088fd0ea5e35189655f84e6814fa56"
 dependencies = [
  "void",
 ]
+
+[[package]]
+name = "unsafe-libyaml"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9dc1c637311091be28e5d462c07db78081e5828da80ba22605c81c4ad6f7f813"
 
 [[package]]
 name = "untrusted"
