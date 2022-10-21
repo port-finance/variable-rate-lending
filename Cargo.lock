@@ -717,10 +717,32 @@ dependencies = [
  "ansi_term",
  "atty",
  "bitflags",
- "strsim",
+ "strsim 0.8.0",
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "clap"
+version = "4.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "335867764ed2de42325fafe6d18b8af74ba97ee0c590fa016f157535b42ab04b"
+dependencies = [
+ "atty",
+ "bitflags",
+ "clap_lex",
+ "strsim 0.10.0",
+ "termcolor",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0d4198f73e42b4936b35b5bb248d81d2b595ecb170da0bac7655c54eedfa8da8"
+dependencies = [
+ "os_str_bytes",
 ]
 
 [[package]]
@@ -2198,6 +2220,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "os_str_bytes"
+version = "6.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ff7415e9ae3fff1225851df9e0d9e4e5479f947619774677a63572e55e80eff"
+
+[[package]]
 name = "ouroboros"
 version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2431,7 +2459,7 @@ dependencies = [
 name = "port-lending-cli"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "clap 4.0.18",
  "port-finance-variable-rate-lending",
  "solana-clap-utils",
  "solana-cli-config",
@@ -2447,7 +2475,7 @@ dependencies = [
 name = "port-staking-cli"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "clap 4.0.18",
  "port-finance-staking",
  "solana-clap-utils",
  "solana-cli-config",
@@ -3423,7 +3451,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fcfcab8bdee54761791184fc53fccf644127e798fff6b9985e1fd7136bb40b8"
 dependencies = [
  "chrono",
- "clap",
+ "clap 2.34.0",
  "rpassword",
  "solana-perf",
  "solana-remote-wallet",
@@ -3462,7 +3490,7 @@ dependencies = [
  "bincode",
  "bs58 0.4.0",
  "bytes",
- "clap",
+ "clap 2.34.0",
  "crossbeam-channel",
  "enum_dispatch",
  "futures",
@@ -3537,7 +3565,7 @@ checksum = "ea1c1f5126e857162c1f68a1952ac7016cc4b36fa5afe0d92364dc636045d0b6"
 dependencies = [
  "bincode",
  "byteorder",
- "clap",
+ "clap 2.34.0",
  "crossbeam-channel",
  "log",
  "serde",
@@ -3629,7 +3657,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26dbfbd7112cbc4eb84c92212d2d9419a34f8df16ce0395da85659d2fc10019e"
 dependencies = [
  "bincode",
- "clap",
+ "clap 2.34.0",
  "crossbeam-channel",
  "log",
  "nix",
@@ -4226,6 +4254,12 @@ name = "strsim"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
+
+[[package]]
+name = "strsim"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "strum"
