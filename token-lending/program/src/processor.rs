@@ -154,6 +154,10 @@ pub fn process_instruction(
             msg!("Withdraw fee from reserve");
             process_withdraw_fee(program_id, accounts)
         }
+        LendingInstruction::UpdateOracle { oracle } => {
+            msg!("Instruction: Update Oracle");
+            process_update_oracle(program_id, oracle, accounts)
+        }
     }
 }
 
@@ -2339,6 +2343,62 @@ fn process_withdraw_fee(program_id: &Pubkey, accounts: &[AccountInfo]) -> Progra
         amount: fee_token.amount,
         authority_signer_seeds,
     })
+}
+
+fn process_update_oracle(
+    program_id: &Pubkey,
+    oracle: COption<Pubkey>,
+    accounts: &[AccountInfo],
+) -> ProgramResult {
+    let account_info_iter = &mut accounts.iter();
+    let reserve_info = next_account_info(account_info_iter)?;
+    let lending_market_info = next_account_info(account_info_iter)?;
+    let lending_market_owner_info = next_account_info(account_info_iter)?;
+
+    if let COption::Some(oracle) = oracle {
+        let oracle_info = next_account_info(account_info_iter)?;
+
+        if *oracle_info.key != oracle {
+            msg!("Oracle doesn't match for updating");
+            return Err(LendingError::InvalidOracleConfig.into());
+        }
+        if !is_pyth_program(oracle_info.owner) && !is_switchbaord_program(oracle_info.owner) {
+            msg!("Invalid Oracle not pyth or switchboard");
+            return Err(LendingError::InvalidOracleConfig.into());
+        }
+    };
+    let mut reserve = Reserve::unpack(&reserve_info.data.borrow())?;
+
+    if reserve_info.owner != program_id {
+        msg!("Reserve provided is not owned by the lending program");
+        return Err(LendingError::InvalidAccountOwner.into());
+    }
+
+    let lending_market = LendingMarket::unpack(&lending_market_info.data.borrow())?;
+    if lending_market_info.owner != program_id {
+        msg!("Lending market provided is not owned by the lending program");
+        return Err(LendingError::InvalidAccountOwner.into());
+    }
+
+    if &lending_market.owner != lending_market_owner_info.key {
+        msg!("Lending market owner does not match the lending market owner provided");
+        return Err(LendingError::InvalidMarketOwner.into());
+    }
+    if !lending_market_owner_info.is_signer {
+        msg!("Lending market owner provided must be a signer");
+        return Err(LendingError::InvalidSigner.into());
+    }
+    if &reserve.lending_market != lending_market_info.key {
+        msg!("Invalid reserve lending market account");
+        return Err(LendingError::InvalidAccountInput.into());
+    }
+
+    reserve.liquidity.oracle_pubkey = oracle;
+    msg!("Updated reserve oracle.");
+
+    Reserve::pack(reserve, &mut reserve_info.data.borrow_mut())?;
+
+    Ok(())
 }
 
 fn assert_rent_exempt(rent: &Rent, account_info: &AccountInfo) -> ProgramResult {

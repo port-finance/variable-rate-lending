@@ -12,7 +12,7 @@ use solana_sdk::{
 
 use helpers::*;
 use port_finance_variable_rate_lending::error::LendingError;
-use port_finance_variable_rate_lending::instruction::update_reserve;
+use port_finance_variable_rate_lending::instruction::{update_oracle, update_reserve};
 use port_finance_variable_rate_lending::state::ReserveConfig;
 use port_finance_variable_rate_lending::{processor::process_instruction, state::ReserveFees};
 
@@ -85,6 +85,143 @@ async fn test_update_reserve() {
         &[update_reserve(
             port_finance_variable_rate_lending::id(),
             new_config,
+            usdc_test_reserve.pubkey,
+            lending_market2.pubkey,
+            lending_market2.owner.pubkey(),
+        )],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer, &lending_market2.owner], recent_blockhash);
+    assert_eq!(
+        banks_client
+            .process_transaction(transaction)
+            .await
+            .unwrap_err()
+            .unwrap(),
+        TransactionError::InstructionError(
+            0,
+            InstructionError::Custom(LendingError::InvalidAccountInput as u32),
+        )
+    );
+}
+
+#[tokio::test]
+async fn test_update_oracle() {
+    let mut test = ProgramTest::new(
+        "port_finance_variable_rate_lending",
+        port_finance_variable_rate_lending::id(),
+        processor!(process_instruction),
+    );
+
+    let lending_market2 = add_lending_market(&mut test);
+    let user_accounts_owner = Keypair::new();
+    let lending_market = add_lending_market(&mut test);
+
+    let usdc_mint = add_usdc_mint(&mut test);
+    let usdc_oracle = add_usdc_pyth_oracle(&mut test);
+    let usdc_test_reserve = add_reserve(
+        &mut test,
+        &lending_market,
+        &usdc_oracle,
+        &user_accounts_owner,
+        AddReserveArgs {
+            liquidity_amount: 42,
+            liquidity_mint_decimals: usdc_mint.decimals,
+            liquidity_mint_pubkey: usdc_mint.pubkey,
+            config: TEST_RESERVE_CONFIG,
+            ..AddReserveArgs::default()
+        },
+    );
+    let sol_oracle = add_sol_pyth_oracle(&mut test);
+    let (_, usdc_switchboard) = add_sol_switchboard_oracle(&mut test, false);
+    let (mut banks_client, payer, recent_blockhash) = test.start().await;
+    let before_test_reserve = usdc_test_reserve.get_state(&mut banks_client).await;
+    assert_ne!(
+        before_test_reserve.liquidity.oracle_pubkey.unwrap(),
+        sol_oracle.price_pubkey
+    );
+
+    let mut transaction = Transaction::new_with_payer(
+        &[update_oracle(
+            port_finance_variable_rate_lending::id(),
+            Some(sol_oracle.price_pubkey),
+            usdc_test_reserve.pubkey,
+            lending_market.pubkey,
+            lending_market.owner.pubkey(),
+        )],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer, &lending_market.owner], recent_blockhash);
+    assert!(banks_client.process_transaction(transaction).await.is_ok());
+
+    let test_reserve = usdc_test_reserve.get_state(&mut banks_client).await;
+    assert_eq!(
+        test_reserve.liquidity.oracle_pubkey.unwrap(),
+        sol_oracle.price_pubkey
+    );
+
+    let mut transaction = Transaction::new_with_payer(
+        &[update_oracle(
+            port_finance_variable_rate_lending::id(),
+            None,
+            usdc_test_reserve.pubkey,
+            lending_market.pubkey,
+            lending_market.owner.pubkey(),
+        )],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer, &lending_market.owner], recent_blockhash);
+    assert!(banks_client.process_transaction(transaction).await.is_ok());
+
+    let test_reserve = usdc_test_reserve.get_state(&mut banks_client).await;
+    assert_eq!(test_reserve.liquidity.oracle_pubkey, COption::None);
+
+    let mut transaction = Transaction::new_with_payer(
+        &[update_oracle(
+            port_finance_variable_rate_lending::id(),
+            Some(usdc_switchboard.price_pubkey),
+            usdc_test_reserve.pubkey,
+            lending_market.pubkey,
+            lending_market.owner.pubkey(),
+        )],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer, &lending_market.owner], recent_blockhash);
+    assert!(banks_client.process_transaction(transaction).await.is_ok());
+
+    let test_reserve = usdc_test_reserve.get_state(&mut banks_client).await;
+    assert_eq!(
+        test_reserve.liquidity.oracle_pubkey.unwrap(),
+        usdc_switchboard.price_pubkey
+    );
+
+    let mut transaction = Transaction::new_with_payer(
+        &[update_oracle(
+            port_finance_variable_rate_lending::id(),
+            Some(Pubkey::new_unique()),
+            usdc_test_reserve.pubkey,
+            lending_market.pubkey,
+            lending_market.owner.pubkey(),
+        )],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer, &lending_market.owner], recent_blockhash);
+    assert_eq!(
+        banks_client
+            .process_transaction(transaction)
+            .await
+            .unwrap_err()
+            .unwrap(),
+        TransactionError::InstructionError(
+            0,
+            InstructionError::Custom(LendingError::InvalidOracleConfig as u32),
+        )
+    );
+
+    let mut transaction = Transaction::new_with_payer(
+        &[update_oracle(
+            port_finance_variable_rate_lending::id(),
+            None,
             usdc_test_reserve.pubkey,
             lending_market2.pubkey,
             lending_market2.owner.pubkey(),
