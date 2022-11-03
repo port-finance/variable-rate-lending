@@ -16,6 +16,7 @@ solana-client = "1.8.1"
 solana-logger = "1.8.1"
 solana-sdk = "1.8.1"
 solana-program = "1.8.1"
+solana-remote-wallet = "1.8.1"
 port-finance-staking = { path = "../program", features = ["no-entrypoint"] }
 spl-token = { version = "3.1.0", features = ["no-entrypoint"] }
 [[bin]]

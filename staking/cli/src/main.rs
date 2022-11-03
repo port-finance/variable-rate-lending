@@ -809,6 +809,15 @@ fn command_change_reward_supply(
                     reward_supply_amount.try_into().unwrap(),
                 )
                 .unwrap(),
+                approve(
+                    &spl_token::id(),
+                    &sub_reward_token_supply.unwrap(),
+                    &transfer_authority.pubkey(),
+                    &source_owner.as_ref().unwrap().pubkey(),
+                    &[],
+                    sub_reward_supply_amount.unwrap().try_into().unwrap(),
+                )
+                    .unwrap(),
                 change_reward_supply(
                     config.staking_program_id,
                     reward_supply_amount,
