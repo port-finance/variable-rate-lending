@@ -171,7 +171,7 @@ fn main() {
                 )
                 .arg(
                     Arg::with_name("sub_reward_token_mint")
-                        .long("mint")
+                        .long("sub-mint")
                         .validator(is_pubkey)
                         .value_name("PUBKEY")
                         .takes_value(true)
