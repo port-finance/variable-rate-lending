@@ -817,7 +817,7 @@ fn command_change_reward_supply(
                     &[],
                     sub_reward_supply_amount.unwrap().try_into().unwrap(),
                 )
-                    .unwrap(),
+                .unwrap(),
                 change_reward_supply(
                     config.staking_program_id,
                     reward_supply_amount,
