@@ -106,6 +106,8 @@ async fn test_success() {
             host_fee_percentage: 20,
         },
         deposit_staking_pool: COption::None,
+        deposit_limit: 2147483647,
+        borrow_limit: 2147483647,
     };
     let usdc_mint = add_usdc_mint(&mut test);
     let usdc_oracle = add_usdc_pyth_oracle(&mut test);
