@@ -61,6 +61,8 @@ async fn test_update_reserve() {
             host_fee_percentage: 15,
         },
         deposit_staking_pool: COption::None,
+        deposit_limit: 2147483647u64,
+        borrow_limit: 2147483647u64,
     };
     let before_test_reserve = usdc_test_reserve.get_state(&mut banks_client).await;
     assert_ne!(before_test_reserve.config, new_config);
