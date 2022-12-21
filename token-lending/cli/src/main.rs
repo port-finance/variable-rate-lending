@@ -681,6 +681,8 @@ fn main() {
                         host_fee_percentage,
                     },
                     deposit_staking_pool: COption::None,
+                    deposit_limit: 2147483647u64,
+                    borrow_limit: 2147483647u64
                 },
                 source_liquidity_pubkey,
                 source_liquidity_owner_keypair,
