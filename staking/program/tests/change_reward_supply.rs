@@ -21,7 +21,7 @@ async fn test_change_reward_supply() {
     const ELAPSED_SLOT: Slot = 500;
     const ELAPSED_SLOT2: Slot = 100;
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
     let stake_account = add_stake_account(&mut test, staking_pool.pubkey);
@@ -181,7 +181,7 @@ async fn test_change_sub_reward_supply() {
     const ELAPSED_SLOT: Slot = 500;
     const ELAPSED_SLOT2: Slot = 100;
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool = add_staking_pool(
         &mut test,
         spl_token::native_mint::id(),

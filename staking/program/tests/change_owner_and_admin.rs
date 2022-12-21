@@ -13,7 +13,7 @@ async fn test_change_owner() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
 
@@ -32,7 +32,7 @@ async fn test_change_owner_fail() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
 
@@ -57,7 +57,7 @@ async fn test_change_admin() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
 
@@ -76,7 +76,7 @@ async fn test_change_admin_fail() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
 

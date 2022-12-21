@@ -33,7 +33,7 @@ async fn test_withdraw_fixed_amount() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(100_000);
+    test.set_compute_max_units(100_000);
 
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 200 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
     const USDC_BORROW_AMOUNT_FRACTIONAL: u64 = 1_000 * FRACTIONAL_TO_USDC;
@@ -162,7 +162,7 @@ async fn test_withdraw_max_amount() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(100_000);
+    test.set_compute_max_units(100_000);
 
     const USDC_DEPOSIT_AMOUNT_FRACTIONAL: u64 =
         1_000 * FRACTIONAL_TO_USDC * INITIAL_COLLATERAL_RATIO;
@@ -378,7 +378,7 @@ async fn test_withdraw_fixed_amount_liquidity_mining() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
 
     test.prefer_bpf(false);
     test.add_program(
@@ -528,7 +528,7 @@ async fn test_withdraw_fixed_amount_liquidity_mining_fail_owner_not_match() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
 
     test.prefer_bpf(false);
     test.add_program(
@@ -677,7 +677,7 @@ async fn test_withdraw_fixed_amount_liquidity_mining_fail() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(33_000);
+    test.set_compute_max_units(33_000);
 
     test.prefer_bpf(false);
     test.add_program(

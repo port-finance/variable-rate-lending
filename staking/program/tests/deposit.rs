@@ -15,7 +15,7 @@ mod helpers;
 #[tokio::test]
 async fn deposit() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(15200);
+    test.set_compute_max_units(15200);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
@@ -80,7 +80,7 @@ async fn deposit() {
 #[tokio::test]
 async fn deposit_zero() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(8200);
+    test.set_compute_max_units(8200);
 
     const AMOUNT: u64 = 0;
     const SLOT: Slot = 10;
@@ -131,7 +131,7 @@ async fn deposit_zero() {
 #[tokio::test]
 async fn deposit_no_authority() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(8200);
+    test.set_compute_max_units(8200);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
@@ -182,7 +182,7 @@ async fn deposit_no_authority() {
 #[tokio::test]
 async fn deposit_does_not_match() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(8200);
+    test.set_compute_max_units(8200);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
