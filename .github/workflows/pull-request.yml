@@ -3,11 +3,11 @@ name: Pull Request
 on:
   pull_request:
     paths-ignore:
-    - 'docs/**'
+      - 'docs/**'
   push:
     branches: [master]
     paths-ignore:
-    - 'docs/**'
+      - 'docs/**'
 
 jobs:
   all_github_action_checks:
@@ -28,7 +28,6 @@ jobs:
         run: |
           source ci/rust-version.sh
           echo "RUST_STABLE=$rust_stable" >> $GITHUB_ENV
-
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ env.RUST_STABLE }}
@@ -51,7 +50,6 @@ jobs:
         run: |
           source ci/rust-version.sh
           echo "RUST_NIGHTLY=$rust_nightly" >> $GITHUB_ENV
-
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ env.RUST_NIGHTLY }}
@@ -68,7 +66,6 @@ jobs:
           key: cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             cargo-clippy-
-
       - name: Install dependencies
         run: ./ci/install-build-deps.sh
 
@@ -89,7 +86,6 @@ jobs:
           echo "RUST_STABLE=$rust_stable" >> $GITHUB_ENV
           source ci/solana-version.sh
           echo "SOLANA_VERSION=$solana_version" >> $GITHUB_ENV
-
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ env.RUST_STABLE }}
@@ -121,14 +117,43 @@ jobs:
           ./ci/install-build-deps.sh
           ./ci/install-program-deps.sh
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
-
       - name: Build and test
-        run: |
-          cargo test-bpf
+        run: ./ci/cargo-build-test.sh
 
-      - name: Upload programs
-        uses: actions/upload-artifact@v2
+  cargo-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set env vars
+        run: |
+          source ci/rust-version.sh nightly
+          echo "RUST_NIGHTLY=$rust_nightly" >> $GITHUB_ENV
+          source ci/solana-version.sh
+          echo "SOLANA_VERSION=$solana_version" >> $GITHUB_ENV
+      - uses: actions-rs/toolchain@v1
         with:
-          name: programs
-          path: "target/deploy/*.so"
-          if-no-files-found: error
+          toolchain: ${{ env.RUST_NIGHTLY }}
+          override: true
+          profile: minimal
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            # target # Removed due to build dependency caching conflicts
+          key: cargo-build-${{ hashFiles('**/Cargo.lock') }}-${{ env.RUST_NIGHTLY }}
+
+      - name: Install dependencies
+        run: |
+          ./ci/install-build-deps.sh
+          ./ci/install-program-deps.sh
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+      - name: run test coverage
+        run: ./coverage.sh token-lending
+
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          file: target/cov/cobertura.xml
