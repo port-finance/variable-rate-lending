@@ -21,7 +21,7 @@ mod helpers;
 async fn test_success() {
     let mut test = staking_test!();
 
-    test.set_bpf_compute_max_units(38200);
+    test.set_compute_max_units(38200);
 
     let supply_accounts_owner = Keypair::new();
     let (mut banks_client, payer, _recent_blockhash) = test.start().await;
@@ -77,7 +77,7 @@ async fn test_success() {
 async fn test_success_with_dual_reward() {
     let mut test = staking_test!();
 
-    test.set_bpf_compute_max_units(82200);
+    test.set_compute_max_units(82200);
 
     let supply_accounts_owner = Keypair::new();
     let (mut banks_client, payer, _recent_blockhash) = test.start().await;
@@ -150,7 +150,7 @@ async fn test_success_with_dual_reward() {
 async fn test_already_initialized() {
     let mut test = staking_test!();
 
-    test.set_bpf_compute_max_units(50000);
+    test.set_compute_max_units(50000);
 
     let transfer_reward_token_authority = Keypair::new();
     const SUPPLY: u64 = 100;
@@ -223,7 +223,7 @@ async fn test_already_initialized() {
 async fn test_zero_supply() {
     let mut test = staking_test!();
 
-    test.set_bpf_compute_max_units(58200);
+    test.set_compute_max_units(58200);
 
     let supply_accounts_owner = Keypair::new();
     let (mut banks_client, payer, _recent_blockhash) = test.start().await;
@@ -270,7 +270,7 @@ async fn test_zero_supply() {
 async fn test_zero_duration() {
     let mut test = staking_test!();
 
-    test.set_bpf_compute_max_units(8200);
+    test.set_compute_max_units(8200);
 
     let supply_accounts_owner = Keypair::new();
     let (mut banks_client, payer, _recent_blockhash) = test.start().await;

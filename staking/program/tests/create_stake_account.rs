@@ -18,7 +18,7 @@ async fn test_success() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(10_000);
+    test.set_compute_max_units(10_000);
     let staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
 
@@ -40,7 +40,7 @@ async fn test_success() {
 async fn test_already_initialized() {
     let mut test = staking_test!();
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(20_000);
+    test.set_compute_max_units(20_000);
 
     let staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);

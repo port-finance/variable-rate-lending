@@ -25,7 +25,7 @@ use std::{
 #[tokio::test]
 async fn claim_reward() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(200000);
+    test.set_compute_max_units(200000);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
@@ -119,7 +119,7 @@ async fn claim_reward() {
 #[tokio::test]
 async fn claim_reward_and_add_sub_reward() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(200000);
+    test.set_compute_max_units(200000);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
@@ -315,7 +315,7 @@ async fn claim_reward_and_add_sub_reward() {
 #[tokio::test]
 async fn claim_reward_no_authority() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(20000);
+    test.set_compute_max_units(20000);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
@@ -403,7 +403,7 @@ async fn claim_reward_no_authority() {
 #[tokio::test]
 async fn claim_reward_before_available_time() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(22200);
+    test.set_compute_max_units(22200);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;
@@ -530,7 +530,7 @@ async fn claim_reward_before_available_time() {
 #[tokio::test]
 async fn claim_reward_update_avaiable_time() {
     let mut test = staking_test!();
-    test.set_bpf_compute_max_units(22200);
+    test.set_compute_max_units(22200);
 
     const AMOUNT: u64 = 10;
     const SLOT: Slot = 10;

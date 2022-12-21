@@ -4,7 +4,6 @@ use solana_program::instruction::InstructionError;
 use solana_program_test::*;
 use solana_sdk::transaction::TransactionError;
 use solana_sdk::{
-    pubkey::Pubkey,
     signature::{Keypair, Signer},
     transaction::Transaction,
 };

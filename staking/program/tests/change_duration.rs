@@ -17,7 +17,7 @@ async fn test_extend_duration() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool = add_staking_pool(
         &mut test,
         spl_token::native_mint::id(),
@@ -52,7 +52,7 @@ async fn test_extend_duration_not_start() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool = add_staking_pool(
         &mut test,
         spl_token::native_mint::id(),
@@ -86,7 +86,7 @@ async fn test_extend_duration_when_end() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool = add_staking_pool(
         &mut test,
         spl_token::native_mint::id(),
@@ -300,7 +300,7 @@ async fn test_reduce_duration() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
     let stake_account = add_stake_account(&mut test, staking_pool.pubkey);
@@ -329,7 +329,7 @@ async fn test_reduce_duration_fail() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
     let stake_account = add_stake_account(&mut test, staking_pool.pubkey);
@@ -358,7 +358,7 @@ async fn test_wrong_admin_fail() {
     let mut test = staking_test!();
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(50_000);
+    test.set_compute_max_units(50_000);
     let mut staking_pool =
         add_staking_pool(&mut test, spl_token::native_mint::id(), 1000, 100, None, 0);
     let stake_account = add_stake_account(&mut test, staking_pool.pubkey);
