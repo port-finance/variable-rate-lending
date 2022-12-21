@@ -34,7 +34,7 @@ async fn test_success() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(300_000);
+    test.set_compute_max_units(300_000);
 
     const FEE_AMOUNT: u64 = 100;
     const HOST_FEE_AMOUNT: u64 = 0;

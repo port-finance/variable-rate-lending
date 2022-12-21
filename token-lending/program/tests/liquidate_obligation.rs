@@ -31,7 +31,7 @@ async fn test_success() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(90_000);
+    test.set_compute_max_units(90_000);
 
     // 100 SOL collateral
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 100 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
@@ -206,7 +206,7 @@ async fn test_success_with_staking() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(150_000);
+    test.set_compute_max_units(150_000);
 
     // 100 SOL collateral
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 100 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
@@ -409,7 +409,7 @@ async fn test_success_with_staking_fail_wrong_owner() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(81_000);
+    test.set_compute_max_units(81_000);
 
     // 100 SOL collateral
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 100 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
@@ -557,7 +557,7 @@ async fn test_fail() {
     );
 
     // limit to track compute unit increase
-    test.set_bpf_compute_max_units(51_000);
+    test.set_compute_max_units(51_000);
 
     // 100 SOL collateral
     const SOL_DEPOSIT_AMOUNT_LAMPORTS: u64 = 100 * LAMPORTS_TO_SOL * INITIAL_COLLATERAL_RATIO;
