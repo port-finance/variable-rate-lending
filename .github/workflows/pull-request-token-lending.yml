@@ -4,12 +4,10 @@ on:
   pull_request:
     paths:
       - 'token-lending/**'
-      - 'token/**'
   push:
     branches: [master]
     paths:
       - 'token-lending/**'
-      - 'token/**'
 
 jobs:
   cargo-test-sbf:
