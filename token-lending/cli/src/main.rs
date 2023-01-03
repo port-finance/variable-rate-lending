@@ -141,7 +141,7 @@ fn main() {
         "flash_loan_fee_wad",
         "host_fee_percentage",
         "deposit_limit",
-        "borrow_limit"
+        "borrow_limit",
     ]
     .into_iter()
     .map(build_u64_arg)
@@ -629,10 +629,8 @@ fn main() {
                 host_fee_percentage.unwrap_or(old_config.fees.host_fee_percentage);
             old_config.fees.flash_loan_fee_wad =
                 flash_loan_fee_wad.unwrap_or(old_config.fees.flash_loan_fee_wad);
-            old_config.deposit_limit =
-                deposit_limit.unwrap_or(old_config.deposit_limit);
-            old_config.borrow_limit =
-                borrow_limit.unwrap_or(old_config.borrow_limit);
+            old_config.deposit_limit = deposit_limit.unwrap_or(old_config.deposit_limit);
+            old_config.borrow_limit = borrow_limit.unwrap_or(old_config.borrow_limit);
             old_config.deposit_staking_pool =
                 deposit_staking_pool.unwrap_or(old_config.deposit_staking_pool);
             command_update_reserve(
