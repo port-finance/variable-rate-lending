@@ -558,6 +558,8 @@ impl LendingInstruction {
         let (flash_loan_fee_wad, rest) = Self::unpack_u64(rest)?;
         let (host_fee_percentage, rest) = Self::unpack_u8(rest)?;
         let (deposit_staking_pool, rest) = Self::unpack_coption_key_compact(rest)?;
+        let (deposit_limit, rest) = Self::unpack_u64(rest)?;
+        let (borrow_limit, rest) = Self::unpack_u64(rest)?;
         Ok((
             ReserveConfig {
                 optimal_utilization_rate,
@@ -573,6 +575,8 @@ impl LendingInstruction {
                     host_fee_percentage,
                 },
                 deposit_staking_pool,
+                deposit_limit,
+                borrow_limit,
             },
             rest,
         ))
@@ -699,6 +703,8 @@ impl LendingInstruction {
                     host_fee_percentage,
                 },
             deposit_staking_pool,
+            deposit_limit,
+            borrow_limit,
         } = reserve_config;
         buf.extend_from_slice(&optimal_utilization_rate.to_le_bytes());
         buf.extend_from_slice(&loan_to_value_ratio.to_le_bytes());
@@ -713,6 +719,8 @@ impl LendingInstruction {
         let mut coption_key_buf = [0u8; 33];
         pack_coption_key_compact(&deposit_staking_pool, &mut coption_key_buf);
         buf.extend_from_slice(&coption_key_buf);
+        buf.extend_from_slice(&deposit_limit.to_le_bytes());
+        buf.extend_from_slice(&borrow_limit.to_le_bytes());
     }
 }
 

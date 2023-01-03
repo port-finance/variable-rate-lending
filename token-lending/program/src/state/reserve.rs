@@ -620,6 +620,10 @@ pub struct ReserveConfig {
     pub fees: ReserveFees,
     /// corresponded staking pool pubkey of deposit
     pub deposit_staking_pool: COption<Pubkey>,
+    /// Maximum deposit limit of liquidity in native units, u64::MAX for inf
+    pub deposit_limit: u64,
+    /// Maximum borrow limit of liquidity in native units, u64::MAX for inf
+    pub borrow_limit: u64,
 }
 
 /// Additional fee information on a reserve
@@ -765,6 +769,8 @@ impl Pack for Reserve {
             config_fees_flash_loan_fee_wad,
             config_fees_host_fee_percentage,
             config_deposit_staking_pool,
+            config_deposit_limit,
+            config_borrow_limit,
             _padding,
         ) = mut_array_refs![
             output,
@@ -795,7 +801,9 @@ impl Pack for Reserve {
             8,
             1,
             33,
-            215
+            8,
+            8,
+            199
         ];
 
         // reserve
@@ -841,6 +849,8 @@ impl Pack for Reserve {
             &self.config.deposit_staking_pool,
             config_deposit_staking_pool,
         );
+        *config_deposit_limit = self.config.deposit_limit.to_le_bytes();
+        *config_borrow_limit = self.config.borrow_limit.to_le_bytes();
     }
 
     /// Unpacks a byte buffer into a [ReserveInfo](struct.ReserveInfo.html).
@@ -875,6 +885,8 @@ impl Pack for Reserve {
             config_fees_flash_loan_fee_wad,
             config_fees_host_fee_percentage,
             config_deposit_staking_pool,
+            config_deposit_limit,
+            config_borrow_limit,
             _padding,
         ) = array_refs![
             input,
@@ -905,7 +917,9 @@ impl Pack for Reserve {
             8,
             1,
             33,
-            215
+            8,
+            8,
+            199
         ];
 
         let version = u8::from_le_bytes(*version);
@@ -951,6 +965,8 @@ impl Pack for Reserve {
                     host_fee_percentage: u8::from_le_bytes(*config_fees_host_fee_percentage),
                 },
                 deposit_staking_pool: unpack_coption_key_compact(config_deposit_staking_pool)?,
+                deposit_limit: u64::from_le_bytes(*config_deposit_limit),
+                borrow_limit: u64::from_le_bytes(*config_borrow_limit),
             },
         })
     }

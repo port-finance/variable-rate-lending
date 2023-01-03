@@ -65,6 +65,8 @@ pub const TEST_RESERVE_CONFIG: ReserveConfig = ReserveConfig {
         host_fee_percentage: 20,
     },
     deposit_staking_pool: COption::None,
+    deposit_limit: u64::MAX,
+    borrow_limit: u64::MAX,
 };
 
 pub const SOL_PYTH_PRODUCT: &str = "3Mnn2fX6rQyUsyELYms1sBJyChWofzSNRoqYzvgMVz5E";

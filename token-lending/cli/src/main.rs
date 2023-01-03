@@ -140,6 +140,8 @@ fn main() {
         "borrow_fee_wad",
         "flash_loan_fee_wad",
         "host_fee_percentage",
+        "deposit_limit",
+        "borrow_limit",
     ]
     .into_iter()
     .map(build_u64_arg)
@@ -514,6 +516,26 @@ fn main() {
                         .default_value("20")
                         .help("Amount of fee going to host account: [0, 100]"),
                 )
+                .arg(
+                    Arg::with_name("deposit_limit")
+                        .long("deposit-limit")
+                        .validator(is_parsable::<u64>)
+                        .value_name("AMOUNT")
+                        .takes_value(true)
+                        .required(true)
+                        .default_value("18446744073709551615")
+                        .help("Maximum deposit limit in terms of lamports"),
+                )
+                .arg(
+                    Arg::with_name("borrow_limit")
+                        .long("borrow-limit")
+                        .validator(is_parsable::<u64>)
+                        .value_name("AMOUNT")
+                        .takes_value(true)
+                        .required(true)
+                        .default_value("18446744073709551615")
+                        .help("Maximum borrow limit in terms of lamports"),
+                )
         )
         .get_matches();
 
@@ -580,7 +602,10 @@ fn main() {
             let borrow_fee_wad = value_of(arg_matches, "borrow_fee_wad");
             let flash_loan_fee_wad = value_of(arg_matches, "flash_loan_fee_wad");
             let host_fee_percentage = value_of(arg_matches, "host_fee_percentage");
+            let deposit_limit = value_of(arg_matches, "deposit_limit");
+            let borrow_limit = value_of(arg_matches, "borrow_limit");
             let deposit_staking_pool = pubkey_or_none_of(arg_matches, "deposit_staking_pool");
+
             let mut old_config =
                 Reserve::unpack(&config.rpc_client.get_account(&reserve).unwrap().data)
                     .unwrap()
@@ -604,6 +629,8 @@ fn main() {
                 host_fee_percentage.unwrap_or(old_config.fees.host_fee_percentage);
             old_config.fees.flash_loan_fee_wad =
                 flash_loan_fee_wad.unwrap_or(old_config.fees.flash_loan_fee_wad);
+            old_config.deposit_limit = deposit_limit.unwrap_or(old_config.deposit_limit);
+            old_config.borrow_limit = borrow_limit.unwrap_or(old_config.borrow_limit);
             old_config.deposit_staking_pool =
                 deposit_staking_pool.unwrap_or(old_config.deposit_staking_pool);
             command_update_reserve(
@@ -681,6 +708,8 @@ fn main() {
                         host_fee_percentage,
                     },
                     deposit_staking_pool: COption::None,
+                    deposit_limit: u64::MAX,
+                    borrow_limit: u64::MAX,
                 },
                 source_liquidity_pubkey,
                 source_liquidity_owner_keypair,

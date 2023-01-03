@@ -70,6 +70,8 @@ async fn test_success() {
             host_fee_percentage: 20,
         },
         deposit_staking_pool: COption::None,
+        deposit_limit: u64::MAX,
+        borrow_limit: u64::MAX,
     };
 
     // oracle price doesn't matter so using usdc oracle for ease of computation
@@ -106,6 +108,8 @@ async fn test_success() {
             host_fee_percentage: 20,
         },
         deposit_staking_pool: COption::None,
+        deposit_limit: u64::MAX,
+        borrow_limit: u64::MAX,
     };
     let usdc_mint = add_usdc_mint(&mut test);
     let usdc_oracle = add_usdc_pyth_oracle(&mut test);
